@@ -1,9 +1,9 @@
-class sellertradeamount{
+class traderinfo{
 	private int ID;  //user ID
 	private double amount;  //seller selling amount
 	private double rate;    //seller selling rate
 	private int time;    //time stamp to track number of days in the selling list
-	public sellertradeamount(int id1, double rate1, double amount1, int time1)
+	public traderinfo(int id1, double rate1, double amount1, int time1)
 	{
 		this.ID=id1;
 		this.amount=amount1;
