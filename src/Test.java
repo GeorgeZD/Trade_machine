@@ -1,16 +1,22 @@
+/*Author: Zhechen DU
+ Created: Oct 1, 2016
+ This class is used to test trade algorithm*/
+
 import java.util.*;
+//import h2db.*;w
 
 public class Test {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
         System.out.println("This is debug test");
         System.out.println("Do you want to initialize lists?");
         System.out.println("enter 1 to initialize");
-        Scanner scan = new Scanner(System.in);
         int i=0;
+        Scanner scan = new Scanner(System.in);
         while (i != 1)
-        		{
+        {
         i=scan.nextInt();
+        H2currenyPool.initialize();
         		}
         scan.close();
         		

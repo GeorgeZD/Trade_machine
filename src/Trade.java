@@ -1,11 +1,13 @@
+/*Author: Zhechen DU
+ Created: Oct 1, 2016
+ This the the trade matching algorithm, where a trade request from user will be matched with trade request
+ from database using h2*/
+ 
 //USD ID: a
 //CAD ID: b
 //RMB ID: c
 import java.util.*;
-class tradestack
-{
-	
-}
+
 public class Trade {
 	public static Stack<Integer> ac = new Stack<Integer>();
 	public static void stacktransfer(Stack<Integer> strans)

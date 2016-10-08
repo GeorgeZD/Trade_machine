@@ -1,3 +1,7 @@
+/*Author: Zhechen DU
+ Created: Oct 1, 2016
+ This class is used to store trade info, each trade request will be assigned with one single trade info
+ stored value are ID, amount, rate, time*/ 
 class traderinfo{
 	private int ID;  //user ID
 	private double amount;  //seller selling amount
