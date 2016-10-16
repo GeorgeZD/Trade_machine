@@ -3,9 +3,9 @@
  This the the trade matching algorithm, where a trade request from user will be matched with trade request
  from database using h2*/
  
-//USD ID: a
-//CAD ID: b
-//RMB ID: c
+//USD ID: 1
+//CAD ID: 2
+//RMB ID: 3
 import java.sql.SQLException;
 import java.util.*;
 
@@ -19,20 +19,21 @@ public class Trade {
 	}
 	public static void match (traderinfo buyerinfo)
 	{
-		double amountleft=buyerinfo.getamount();
+		//get buyerinfo
 		int currencyid=buyerinfo.getcid();
-		double buyeramount=amountleft;
 		double buyerID= buyerinfo.getID();
+		double amountleft=buyerinfo.getamount()*buyerinfo.getrate();
+		
+		double buyeramount=amountleft;
 		//swith to seller exchang rate
 		double buyerrate=1/buyerinfo.getrate();
-		double buyerextotamount=0;
-		
+		double buyerextotamount=0;		
 		System.out.println("ID: " + buyerinfo.getID() + " rate: " + buyerinfo.getrate() + " amount: "
-		+ buyerinfo.getamount() + " time: " + buyerinfo.gettime());
+		+ amountleft + " time: " + buyerinfo.gettime());
 		
 		int exratebig=0;
 		traderinfo sellerinfo=new traderinfo(0,0,0,0,0);
-		while ((amountleft>0)||(exratebig!=1))
+		while (amountleft>0)
 		{
 			try {
 				sellerinfo=H2currenyPool.poolQuary(currencyid, buyeramount);
@@ -42,55 +43,45 @@ public class Trade {
 				System.out.println("poolQuary not found");
 			}
 			double selleramount=sellerinfo.getamount();
-			int sellererID= sellerinfo.getID();
-			double sellerrate=sellerinfo.getrate();
-			
-			System.out.println("ID: " + sellerinfo.getID() + "C_ID: " + sellerinfo.getcid() + " rate: "
-			+ sellerinfo.getrate() + " amount: "
-			+ sellerinfo.getamount() + " time: " + sellerinfo.gettime());
-			// when seller is selling more then buyer's request
-			double sellerexamount=(double)Math.round(selleramount*sellerrate*10000)/10000;
-			//if buyer asking amount is less than seller
-			if (sellerexamount>amountleft)
+			//int sellererID= sellerinfo.getID();
+			//double sellerrate=sellerinfo.getrate();
+			System.out.println("ID: " + sellerinfo.getID() + " C_ID: " + sellerinfo.getcid() 
+			+ " rate: " + sellerinfo.getrate() + " amount: "
+			+ selleramount + " time: " + sellerinfo.gettime());
+			System.out.println("amountleft:"+amountleft);
+
+			if (selleramount==0)
 			{
-				//sellerinfo.setamount(sellerexamount-amountleft);
-				//stackpush(sellerinfo);
-				buyerextotamount=Math.round(amountleft/sellerrate*10000)/10000+buyerextotamount;
-				amountleft=0; //terminate while loop
-				//update database
-				
+				break;
+			}
+			else if (Math.round(amountleft*10000)==Math.round(selleramount*10000))
+			{
+				amountleft=0;
 				stackpush(sellerinfo);
 				
 			}
-			//if buyer request equal to seller request
-			else if (sellerexamount==amountleft)
+			else if (amountleft>selleramount)
 			{
-				buyerextotamount=Math.round(amountleft/sellerrate*10000)/10000+buyerextotamount;
-				//sellerinfo.setamount(0);
-				amountleft=0;
-				//update database
+				amountleft=amountleft-selleramount;
+				stackpush(sellerinfo);
 			}
-			//if buyer request bigger than seller request
 			else
 			{
-				//sellerinfo.setamount(0);
-				amountleft=amountleft-sellerexamount;
-				buyerextotamount=selleramount+buyerextotamount;
-				//update database
+				System.out.println("match error");
+				break;
 			}
-			
-//			//trade if seller exchange rate 
-//			if (sellerrate<buyerrate)
-//			{
-//
-//			}
-//			else
-//			{
-//				exratebig=1;
-//			}
-			System.out.println(buyerextotamount);
+
+
 		}
-		System.out.println(buyerextotamount);
+		
+		//output the updated table
+		try {
+			H2currenyPool.readtable();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//System.out.println(buyerextotamount);
 		//small seller exchange=good 
 	}
 	public static void stackpush( traderinfo sellinfo) {

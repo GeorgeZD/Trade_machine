@@ -23,12 +23,12 @@ public class Test {
 
         //if i=1, initial
         if (i ==1)
-        		{
+        {
         	
-        		}
+        }
         
-        Testtrade.input();
-        Testtrade.stacktransfer();
+        //Testtrade.input();
+        //Testtrade.stacktransfer();
         Testtrade.trade();
         
     }
@@ -43,7 +43,8 @@ class Testtrade {
 	}
 	public static void trade()
 	{
-		traderinfo buyinfo = new traderinfo(1,12,0.166,1000,7);
+		//trading 5000 RMB for USD 
+		traderinfo buyinfo = new traderinfo(1,12,0.167,5000,7);
 		Trade.match(buyinfo);
 		
 	}

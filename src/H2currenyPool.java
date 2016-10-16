@@ -35,6 +35,7 @@ public class H2currenyPool {
             createpoolloc(trade_id);
             createpool(trade_id);
             updatetable(cur_loc,cur_pool);
+            readtable();
             //insertWithStatement();
 
             //insertWithPreparedStatement();
@@ -155,7 +156,7 @@ public class H2currenyPool {
 		//creating table
 		Connection connection = getPoolConnection();
 		Statement stmt = connection.createStatement();
-		stmt.execute("CREATE TABLE Currency_loc(id int auto_increment primary key, trade_id int, pool_loc int,"
+		stmt.execute("CREATE TABLE Currency_loc(id int auto_increment primary key, trade_id int unique, pool_loc int,"
         		+ "pool_preloc int)" );
 		for (int i=0; i<trade_id.length; i++)
 		{
@@ -222,18 +223,7 @@ public class H2currenyPool {
             }
             //stmt.execute("INSERT INTO Currency_loc( trade_id,pool_loc,pool_preloc) VALUES(11,3000,4000)");
 
-            ResultSet rs = stmt.executeQuery("select * from Currency_loc");
-            System.out.println("H2 In-Memory Database Currency_loc Table");
-            while (rs.next()) {
-                System.out.println("Id " + rs.getInt("id") + " trade_id " + rs.getInt("trade_id")
-                +" pool_loc " + rs.getInt("pool_loc")+" pool_preloc " + rs.getInt("pool_preloc"));
-            }
-            ResultSet rs1 = stmt.executeQuery("select * from Currency_pool");
-            System.out.println("H2 In-Memory Database Currency_pool Table");
-            while (rs1.next()) {
-                System.out.println("Id " + rs1.getInt("id") + " user_id " + rs1.getInt("user_id")
-                +" ex_rate " + rs1.getInt("ex_rate")+ "time " + rs1.getInt("time"));
-            }
+
 
             //stmt.execute("DROP TABLE Currency_loc");
             stmt.close();
@@ -247,6 +237,30 @@ public class H2currenyPool {
         }
 		// TODO Auto-generated method stub
 		
+	}
+	public static void readtable() throws SQLException
+	{
+        Connection connection = getPoolConnection();
+        Statement stmt=null;
+		try {
+			stmt = connection.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        ResultSet rs = stmt.executeQuery("Select * FROM Currency_loc");
+        System.out.println("H2 In-Memory Database Currency_loc Table");
+        while (rs.next()) {
+            System.out.println("Id " + rs.getInt("id") + " trade_id " + rs.getInt("trade_id")
+            +" pool_loc " + rs.getInt("pool_loc")+" pool_preloc " + rs.getInt("pool_preloc"));
+        }
+        ResultSet rs1 = stmt.executeQuery("Select * from Currency_pool");
+        System.out.println("H2 In-Memory Database Currency_pool Table");
+        while (rs1.next()) {
+            System.out.println("Id " + rs1.getInt("id") + " user_id " + rs1.getInt("user_id")
+            +" ex_rate " + rs1.getInt("ex_rate")+ "time " + rs1.getInt("time"));
+        }
+        stmt.close();
 	}
 	//switchtable is used to update pretable
 	public static void switchtable()
@@ -270,42 +284,65 @@ public class H2currenyPool {
 		int amount_t=(int)Math.round(amount_t1*10000);
 		Connection connection = getPoolConnection();
 		Statement stmt = connection.createStatement();
-		ResultSet rs = stmt.executeQuery("select * from Currency_loc WHERE trade_id="+cur_id+"" );
-		ResultSet rspool = stmt.executeQuery("select * from Currency_loc WHERE trade_id="
-				+ ""+rs.getInt("pool_loc")+"" );
-		int amount_new=amount_t-rspool.getInt("amount");
-		//amount =0, check next row,update currency location
-		if (amount_new==0)
+		ResultSet rs = stmt.executeQuery("select * FROM Currency_loc WHERE trade_id="+cur_id+"" );
+		rs.next();
+		int pool_loc=rs.getInt("pool_loc");
+		if (pool_loc==0)
 		{
+			traderinfo seller=new traderinfo(0,0,0,0,0);
+			return seller;
+		}
+		System.out.println(pool_loc);
+		ResultSet rspool = stmt.executeQuery("select * FROM Currency_pool WHERE id="
+				+ ""+pool_loc+"" );
+		rspool.next();
+		int user_id=rspool.getInt("user_id");
+		int user_time=rspool.getInt("time");
+		int amount_sell=rspool.getInt("amount");
+		//int rate_fi=rspool.getInt("ex_rate");
+		double rate_f=(double)rspool.getInt("ex_rate")/10000;
+		double amount_f=0;
+		if (amount_sell>amount_t)
+		{
+			int amount_new=amount_sell-amount_t;
+			stmt.execute("UPDATE Currency_pool SET ( amount) =("+amount_new+") "
+					+ "WHERE id ="+pool_loc+"");
+			amount_f=amount_t1;
+		}
+		//amount_sell =amount buy, check next row,update currency location
+		//else if(amount_sell<=amount_t)
+		else
+		{
+			amount_f=(double)(amount_sell/10000);
+			//update the row to zero and quarry next row
 			stmt.execute("UPDATE Currency_pool SET (user_id, ex_rate, amount,time) =(0,0,0,0) "
-					+ "WHERE id ="+rs.getInt("pool_loc")+"");
+					+ "WHERE id ="+pool_loc+"");
 			ResultSet rs_new = stmt.executeQuery("select * from Currency_pool WHERE id="
-					+ ""+(rs.getInt("pool_loc")+1)+"" );
+					+ ""+(pool_loc+1)+"" );
+			rs_new.next();
+			int amount_next=rs_new.getInt("amount");
 			//if new row =0
-			if (rs_new.getInt("amount")==0)
+			//update currency location if next amount is not zero
+			if (amount_next==0)
 			{
 				stmt.execute("UPDATE Currency_loc SET (pool_loc) =(0) "
 						+ "WHERE trade_id ="+cur_id+"");
 			}
 			else
 			{
-				stmt.execute("UPDATE Currency_loc SET (pool_loc) =("+rs.getInt("pool_loc")+") "
+				stmt.execute("UPDATE Currency_loc SET (pool_loc) =("+pool_loc+1+") "
 						+ "WHERE trade_id ="+cur_id+"");
 			}
 		}
-		else
-		{
-			stmt.execute("UPDATE Currency_pool SET ( amount_t) =("+amount_new+") "
-					+ "WHERE id ="+rs.getInt("pool_loc")+"");
-		}
-		double amount_f=(double)rs.getInt("amount")/10000;
-		double rate_f=(double)rs.getInt("ex_rate")/10000;
-		//user_id,ex_rate,amount,time
-		traderinfo seller=new traderinfo(rs.getInt("user_id"),cur_id,amount_f,rate_f,rs.getInt("time"));
-		
         stmt.close();
         connection.commit();
 		connection.close();
+		
+
+		//user_id,ex_rate,amount,time
+		traderinfo seller=new traderinfo(user_id,cur_id,rate_f,amount_f,user_time);
+		
+
 		return seller;
 	}
 	
