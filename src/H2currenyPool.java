@@ -258,7 +258,8 @@ public class H2currenyPool {
         System.out.println("H2 In-Memory Database Currency_pool Table");
         while (rs1.next()) {
             System.out.println("Id " + rs1.getInt("id") + " user_id " + rs1.getInt("user_id")
-            +" ex_rate " + rs1.getInt("ex_rate")+ "time " + rs1.getInt("time"));
+            +" ex_rate " + rs1.getInt("ex_rate")+ "amount"+rs1.getInt("amount")
+            +"time " + rs1.getInt("time"));
         }
         stmt.close();
 	}
@@ -300,7 +301,12 @@ public class H2currenyPool {
 		int user_time=rspool.getInt("time");
 		int amount_sell=rspool.getInt("amount");
 		//int rate_fi=rspool.getInt("ex_rate");
-		double rate_f=(double)rspool.getInt("ex_rate")/10000;
+		int rate_f=rspool.getInt("ex_rate");
+		System.out.println("rate_f: "+rate_f+" amount_t: "+amount_t);
+		double amount_t2=(double)amount_t/rate_f;
+		amount_t=(int )Math.round(amount_t2*10000);
+		
+		System.out.println("amount_sell: "+amount_sell+" amount_t: "+amount_t);
 		double amount_f=0;
 		if (amount_sell>amount_t)
 		{
@@ -310,17 +316,18 @@ public class H2currenyPool {
 			amount_f=amount_t1;
 		}
 		//amount_sell =amount buy, check next row,update currency location
-		//else if(amount_sell<=amount_t)
 		else
 		{
 			amount_f=(double)(amount_sell/10000);
+			int pool_locn=pool_loc+1;
 			//update the row to zero and quarry next row
 			stmt.execute("UPDATE Currency_pool SET (user_id, ex_rate, amount,time) =(0,0,0,0) "
 					+ "WHERE id ="+pool_loc+"");
 			ResultSet rs_new = stmt.executeQuery("select * from Currency_pool WHERE id="
-					+ ""+(pool_loc+1)+"" );
+					+ ""+pool_locn+"" );
 			rs_new.next();
 			int amount_next=rs_new.getInt("amount");
+
 			//if new row =0
 			//update currency location if next amount is not zero
 			if (amount_next==0)
@@ -330,7 +337,7 @@ public class H2currenyPool {
 			}
 			else
 			{
-				stmt.execute("UPDATE Currency_loc SET (pool_loc) =("+pool_loc+1+") "
+				stmt.execute("UPDATE Currency_loc SET (pool_loc) =("+pool_locn+") "
 						+ "WHERE trade_id ="+cur_id+"");
 			}
 		}
@@ -338,9 +345,10 @@ public class H2currenyPool {
         connection.commit();
 		connection.close();
 		
-
+		amount_f=Math.round(amount_f*10000)/10000;
+		double rate_f1=(double)rate_f/10000;
 		//user_id,ex_rate,amount,time
-		traderinfo seller=new traderinfo(user_id,cur_id,rate_f,amount_f,user_time);
+		traderinfo seller=new traderinfo(user_id,cur_id,rate_f1,amount_f,user_time);
 		
 
 		return seller;

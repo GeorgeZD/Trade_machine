@@ -44,7 +44,7 @@ class Testtrade {
 	public static void trade()
 	{
 		//trading 5000 RMB for USD 
-		traderinfo buyinfo = new traderinfo(1,12,0.167,5000,7);
+		traderinfo buyinfo = new traderinfo(1,12,0.167,6000,7);
 		Trade.match(buyinfo);
 		
 	}
