@@ -33,6 +33,7 @@ public class Trade {
 		traderinfo sellerinfo=new traderinfo(0,0,0,0,0);
 		while (amountleft>0)
 		{
+			System.out.println("amountleft:"+amountleft);
 			try {
 				sellerinfo=H2currenyPool.poolQuary(currencyid, amountleft);
 			} catch (SQLException e) {
@@ -46,7 +47,7 @@ public class Trade {
 			System.out.println("ID: " + sellerinfo.getID() + " C_ID: " + sellerinfo.getcid() 
 			+ " rate: " + sellerinfo.getrate() + " amount: "
 			+ selleramount + " time: " + sellerinfo.gettime());
-			System.out.println("amountleft:"+amountleft);
+			
 			//if return is zero, break the while loop
 			if (selleramount==0)
 			{
@@ -59,14 +60,27 @@ public class Trade {
 				seller_Stack.stackpush(sellerinfo);
 				
 			}
+			//if selleramount is smaller than amount left, push amount left into stack
 			else if (amountleft>selleramount)
 			{
 				amountleft=amountleft-selleramount;
 				seller_Stack.stackpush(sellerinfo);
 			}
+			//the amountleft is smaller than seller amount
 			else
 			{
-				System.out.println("match error");
+				seller_Stack.stackpush(sellerinfo);
+//				sellerinfo.setamount((selleramount-amountleft)/sellerinfo.getrate());
+//				try {
+//					H2currenyPool.update_notrade(sellerinfo);
+//				} catch (SQLException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//					System.out.println("update trade did not complete");
+//				}
+//				sellerinfo.setamount((amountleft)/sellerinfo.getrate());
+//				seller_Stack.stackpush(sellerinfo);
+				//System.out.println("match error");
 				break;
 			}
 
@@ -75,6 +89,7 @@ public class Trade {
 		}
 		
 		//output the updated table
+		System.out.println("Read table");
 		try {
 			H2currenyPool.readtable();
 		} catch (SQLException e) {
