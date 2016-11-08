@@ -17,15 +17,17 @@ public class Trade {
 	}
 	public static void match (traderinfo buyerinfo)
 	{
+		
+		double totalAmount=0;
 		//get buyerinfo
 		int currencyid=buyerinfo.getcid();
-		double buyerID= buyerinfo.getID();
+		//double buyerID= buyerinfo.getID();
 		double amountleft=buyerinfo.getamount();
 		
-		double buyeramount=amountleft;
-		//swith to seller exchang rate
-		double buyerrate=1/buyerinfo.getrate();
-		double buyerextotamount=0;		
+//		double buyeramount=amountleft;
+//		//swith to seller exchang rate
+//		double buyerrate=1/buyerinfo.getrate();
+//		double buyerextotamount=0;		
 		System.out.println("ID: " + buyerinfo.getID() + " rate: " + buyerinfo.getrate() + " amount: "
 		+ amountleft + " time: " + buyerinfo.gettime());
 		
@@ -40,6 +42,8 @@ public class Trade {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				System.out.println("poolQuary not found");
+				
+				break;
 			}
 			double selleramount=sellerinfo.getamount()*sellerinfo.getrate();
 			//int sellererID= sellerinfo.getID();
@@ -58,6 +62,7 @@ public class Trade {
 			{
 				amountleft=0;
 				seller_Stack.stackpush(sellerinfo);
+				totalAmount+=sellerinfo.getamount();
 				
 			}
 			//if selleramount is smaller than amount left, push amount left into stack
@@ -65,11 +70,14 @@ public class Trade {
 			{
 				amountleft=amountleft-selleramount;
 				seller_Stack.stackpush(sellerinfo);
+				totalAmount+=sellerinfo.getamount();
 			}
 			//the amountleft is smaller than seller amount
 			else
 			{
 				seller_Stack.stackpush(sellerinfo);
+				totalAmount+=sellerinfo.getamount();
+				amountleft=0;
 //				sellerinfo.setamount((selleramount-amountleft)/sellerinfo.getrate());
 //				try {
 //					H2currenyPool.update_notrade(sellerinfo);
@@ -87,6 +95,8 @@ public class Trade {
 
 
 		}
+		seller_Stack.stackpushs(amountleft);
+		seller_Stack.stackpushs(totalAmount);
 		
 		//output the updated table
 		System.out.println("Read table");

@@ -214,6 +214,7 @@ public class H2currenyPool {
 	private static void updatetable(int[][] cur_loc, int [][]cur_pool) throws SQLException {
         Connection connection = getPoolConnection();
         Statement stmt = null;
+        int index=cur_loc[0][0]%10+((int)(cur_loc[0][0]/10))%10-3;
         try {
             connection.setAutoCommit(false);
             stmt = connection.createStatement();
@@ -222,13 +223,13 @@ public class H2currenyPool {
             {
             	//System.out.println(i);
             stmt.execute("UPDATE Currency_loc SET( trade_id,pool_loc,pool_preloc) =("
-            		+ ""+cur_loc[i][0]+", "+cur_loc[i][1]+", "+cur_loc[i][2]+")WHERE id="+(i+1)+"" );
+            		+ ""+cur_loc[i][0]+", "+cur_loc[i][1]+", "+cur_loc[i][2]+")WHERE id="+(i+index+1)+"" );
             }
 
             for (int i=0; i<cur_pool.length; i++)
             {
             stmt.execute("UPDATE Currency_pool SET( user_id,ex_rate,amount,time)=("
-            		+ ""+cur_pool[i][0]+", "+cur_pool[i][1]+", "+cur_pool[i][2]+", "+cur_pool[i][3]+")WHERE id="+(i+1)+"");
+            		+ ""+cur_pool[i][0]+", "+cur_pool[i][1]+", "+cur_pool[i][2]+", "+cur_pool[i][3]+")WHERE id="+(i+1+index*1000)+"");
             }
             //stmt.execute("INSERT INTO Currency_loc( trade_id,pool_loc,pool_preloc) VALUES(11,3000,4000)");
 

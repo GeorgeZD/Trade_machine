@@ -31,6 +31,8 @@ public class Test {
         //Testtrade.input();
         //Testtrade.stacktransfer();
         Testtrade.trade();
+        System.out.println(seller_Stack.stackpops());
+        System.out.println(seller_Stack.stackpops());
         traderinfo sellerinfo=seller_Stack.stackpop();
         while(sellerinfo.getID() !=0)
         {
@@ -39,7 +41,8 @@ public class Test {
     				+ sellerinfo.getamount() + " time: " + sellerinfo.gettime());
     		sellerinfo=seller_Stack.stackpop();
         }
-        
+        H2PoolSort.initialize();
+        H2PoolSort.sort(12);
     }
 
 }

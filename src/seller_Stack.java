@@ -15,8 +15,17 @@ public class seller_Stack {
 		ac.push(new Integer(amount));
 		ac.push(new Integer(time));
 	}
+	public static void stackpushs( double amount) {
+		int amounts = (int) Math.round(amount * 10000);
+		ac.push(new Integer(amounts));
+	}
+	public static double stackpops( ) {
+		//int amounts = (int) Math.round(amount * 10000);
+		double amounts = (double) ((Integer) ac.pop() / 10000);
+		return amounts;
+	}
 
-	public  traderinfo stackpop() {
+	public static traderinfo stackpop() {
 		// int rate1=int(Math.round(rate*10000));
 		// traderinfo info= new traderinfo();
 		traderinfo sellinfo = new traderinfo(0 ,0,0,0,0);
