@@ -313,7 +313,7 @@ public class H2currenyPool {
 		//int rate_fi=rspool.getInt("ex_rate");
 		int rate_f=rspool.getInt("ex_rate");
 		System.out.println("rate_f: "+rate_f+" amount_t: "+amount_t);
-		double amount_t2=(double)amount_t/rate_f;
+		double amount_t2=((double)amount_t)/rate_f;
 		amount_t=(int )Math.round(amount_t2*10000);
 		
 		System.out.println("amount_sell: "+amount_sell+" amount_t: "+amount_t);

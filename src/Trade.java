@@ -15,9 +15,31 @@ public class Trade {
 	{
 		
 	}
-	public static void match (traderinfo buyerinfo)
+	public static int notrade()
 	{
-		
+		int insertsus=0;
+		traderinfo sellerinfo=seller_Stack.stackpop();
+    	while(sellerinfo.getID()!=0)
+    	{
+    		System.out.println("ID: " + sellerinfo.getID() + "CID: " + sellerinfo.getcid() +" rate: " + sellerinfo.getrate() + " amount: "
+    				+ sellerinfo.getamount() + " time: " + sellerinfo.gettime());
+    		try {
+				H2currenyPool.update_notrade(sellerinfo);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("update_notrade not successful");
+				return insertsus;
+			}
+    		sellerinfo=seller_Stack.stackpop();
+    	}
+    	insertsus=1;
+		return insertsus;
+	}
+	
+	public static int match (traderinfo buyerinfo)
+	{
+		int result_id=0;
 		double totalAmount=0;
 		//get buyerinfo
 		int currencyid=buyerinfo.getcid();
@@ -106,6 +128,12 @@ public class Trade {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		if (amountleft==0)
+		{
+			result_id=1;
+			
+		}
+		return result_id;
 		//System.out.println(buyerextotamount);
 		//small seller exchange=good 
 	}

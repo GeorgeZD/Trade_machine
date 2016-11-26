@@ -9,9 +9,9 @@ public class Test {
 
 	public static void main(String[] args) throws Exception {
         System.out.println("This is debug test");
-        System.out.println("Do you want to initialize lists?");
-        System.out.println("enter 1 to initialize");
-        int i=0;
+        //System.out.println("Do you want to initialize lists?");
+        //System.out.println("enter 1 to initialize");
+        //int i=0;
 /*        Scanner scan = new Scanner(System.in);
         while (i != 1)
         {
@@ -23,46 +23,76 @@ public class Test {
         H2currenyPool.initialize();
 
         //if i=1, initial
-        if (i ==1)
-        {
-        	
-        }
         
         //Testtrade.input();
         //Testtrade.stacktransfer();
         Testtrade.trade();
         System.out.println(seller_Stack.stackpops());
         System.out.println(seller_Stack.stackpops());
-        traderinfo sellerinfo=seller_Stack.stackpop();
-        while(sellerinfo.getID() !=0)
+        //traderinfo sellerinfo=seller_Stack.stackpop();
+//        while(sellerinfo.getID() !=0)
+//        {
+//        	System.out.println("seller info");
+//    		System.out.println("ID: " + sellerinfo.getID() + "CID: " + sellerinfo.getcid() +" rate: " + sellerinfo.getrate() + " amount: "
+//    				+ sellerinfo.getamount() + " time: " + sellerinfo.gettime());
+//    		sellerinfo=seller_Stack.stackpop();
+//        }
+        System.out.println("enter 1 for no trade");
+        Scanner scan = new Scanner(System.in);
+        int i=scan.nextInt();
+        if (i == 1)
         {
-        	System.out.println("seller info");
-    		System.out.println("ID: " + sellerinfo.getID() + "CID: " + sellerinfo.getcid() +" rate: " + sellerinfo.getrate() + " amount: "
-    				+ sellerinfo.getamount() + " time: " + sellerinfo.gettime());
-    		sellerinfo=seller_Stack.stackpop();
+        	System.out.println("no trade");
+        	int sus=Trade.notrade();
+        	if (sus==1)
+        	{
+        		System.out.println("insert into database successful");
+        	}
+        
         }
-        H2PoolSort.initialize();
-        H2PoolSort.sort(12);
+        else
+        {
+        	traderinfo sellerinfo=seller_Stack.stackpop();
+        	while(sellerinfo.getID()!=0)
+        	{
+        		sellerinfo=seller_Stack.stackpop();
+        	}
+        }
+        scan.close();
+//        H2PoolSort.initialize();
+//        H2PoolSort.sort(12);
+        H2currenyPool.readtable();
     }
 
 }
 
 class Testtrade {
 	public static Stack<Integer> ac = new Stack<Integer>();
-	public static void stacktransfer()
-	{
-		Trade.stacktransfer(ac);
-	}
+//	public static void stacktransfer()
+//	{
+//		Trade.stacktransfer(ac);
+//	}
 	public static void trade()
 	{
 		//trading 5000 RMB for USD 
 		traderinfo buyinfo = new traderinfo(1,12,0.167,6000,7);
-		Trade.match(buyinfo);
+		int tradere=Trade.match(buyinfo);
+		//check if there is amount left.
+		if (tradere==1)
+		{
+			
+			System.out.println("no amount left");
+			
+		}
+		else
+		{
+			
+			System.out.println("Smount left");
+		}
 		
 	}
 	public static void input() {
 		traderinfo sellerinfo = new traderinfo(1,12, 6, 1000, 7);
-
 		// create stack USD to RMB
 		
 		// rate and amount should have accuracy of 4 decimal places.

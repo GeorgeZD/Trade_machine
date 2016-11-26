@@ -5,6 +5,7 @@ public class seller_Stack {
 	public static Stack<Integer> ac = new Stack<Integer>();
 	public static void stackpush( traderinfo sellinfo) {
 		int id = sellinfo.getID();
+		
 		int rate = (int) Math.round(sellinfo.getrate() * 10000);
 		int amount = (int) Math.round(sellinfo.getamount() * 10000);
 		int time = sellinfo.gettime();
@@ -21,7 +22,7 @@ public class seller_Stack {
 	}
 	public static double stackpops( ) {
 		//int amounts = (int) Math.round(amount * 10000);
-		double amounts = (double) ((Integer) ac.pop() / 10000);
+		double amounts = ((double) ac.pop()) / 10000;
 		return amounts;
 	}
 
@@ -36,9 +37,12 @@ public class seller_Stack {
 		else
 		{
 			sellinfo.settime((Integer) ac.pop());
-			double amount = (double) ((Integer) ac.pop() / 10000);
+			
+			
+			double amount =   ((double) ac.pop()) / 10000;
+			System.out.println("amount pop"+amount);
 			sellinfo.setamount(amount);
-			double rate = (double) ((Integer) ac.pop() / 10000);
+			double rate = ((double) ac.pop()) / 10000;
 			sellinfo.setrate(rate);
 			sellinfo.setcid((Integer) ac.pop());
 			sellinfo.setID((Integer) ac.pop());
